@@ -10,3 +10,4 @@
   - ip 4/6
   - udp/tcp
   - show names/addresses
+  - socket state
