@@ -15,9 +15,6 @@ struct Cli {
 
     #[arg(short = 'u', name = "U", required = false,  help = "show udp only", conflicts_with("T"))]
     udp: bool
-
-
-
 }
 
 fn main() {
@@ -77,11 +74,13 @@ fn extract_family(cli: &Cli) -> AddressFamilyFlags {
 }
 
 fn show_udp(p : UdpSocketInfo) {
-    println!("UDP => lp: {} ", p.local_port );
+    println!("udp   {:>39}:{:>5} ",p.local_addr, p.local_port  );
 }
 
 fn show_tcp(p : TcpSocketInfo) {
-    println!("TCP => {} ({}) => {} ({}) {}", p.local_port, p.local_addr, p.remote_port, p.remote_addr, p.state );
+    
+    //tcp        0      0 10.0.0.167:57890        51.81.245.207:443       ESTABLISHED
+    println!("tcp    {:>39}:{:>5} => {:>39}:{:>5} {}",  p.local_addr,p.local_port,  p.remote_addr, p.remote_port,p.state );
 /*    match p.state {
         netstat::TcpState::Closed => todo!(),
         netstat::TcpState::Listen => todo!(),
