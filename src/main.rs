@@ -8,7 +8,14 @@ struct Cli {
     ip4: bool,
 
     #[arg(short = '6', name = "6", required = false,  help = "show ip 6 only", conflicts_with("4"))]
-    ip6: bool
+    ip6: bool,
+
+    #[arg(short = 't', name = "T", required = false,  help = "show tcp only", conflicts_with("U"))]
+    tcp: bool,
+
+    #[arg(short = 'u', name = "U", required = false,  help = "show udp only", conflicts_with("T"))]
+    udp: bool
+
 
 
 }
@@ -17,10 +24,9 @@ fn main() {
     println!("Start !");
     let cli = Cli::parse();
     println!("{:?}", cli);
-    let af_flags = fun_name(cli);
 
-    
-    let proto_flags: ProtocolFlags = ProtocolFlags::all();
+    let af_flags = extract_family(&cli);    
+    let proto_flags = extract_protocol(&cli);
 
     let sockets = iterate_sockets_info(af_flags, proto_flags);
     if sockets.is_err() {
@@ -48,7 +54,18 @@ fn main() {
 
 }
 
-fn fun_name(cli: Cli) -> AddressFamilyFlags {
+fn extract_protocol(cli: &Cli)  -> ProtocolFlags {
+    let proto_flags: ProtocolFlags = if cli.tcp {
+        ProtocolFlags::TCP
+    } else if cli.udp {
+        ProtocolFlags::UDP
+    } else {
+        ProtocolFlags::all()
+    };
+    proto_flags
+}
+
+fn extract_family(cli: &Cli) -> AddressFamilyFlags {
     let af_flags: AddressFamilyFlags = if cli.ip4 {
         AddressFamilyFlags::IPV4
     } else if cli.ip6 {
