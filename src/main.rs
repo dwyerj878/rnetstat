@@ -1,8 +1,25 @@
 use netstat::{iterate_sockets_info, AddressFamilyFlags, ProtocolFlags, ProtocolSocketInfo, TcpSocketInfo, UdpSocketInfo};
+use clap::Parser;
+
+#[derive(Parser, Default, Debug)]
+struct Cli {
+    // ip v4 or v6 both if unspecified
+    #[arg(short = '4', name = "4", required = false,  help = "show ip 4 only", conflicts_with("6"))]
+    ip4: bool,
+
+    #[arg(short = '6', name = "6", required = false,  help = "show ip 6 only", conflicts_with("4"))]
+    ip6: bool
+
+
+}
 
 fn main() {
-    println!("Hello, world!");
-    let af_flags = AddressFamilyFlags::all();
+    println!("Start !");
+    let cli = Cli::parse();
+    println!("{:?}", cli);
+    let af_flags = fun_name(cli);
+
+    
     let proto_flags: ProtocolFlags = ProtocolFlags::all();
 
     let sockets = iterate_sockets_info(af_flags, proto_flags);
@@ -29,6 +46,17 @@ fn main() {
     }
     println!("... Done");
 
+}
+
+fn fun_name(cli: Cli) -> AddressFamilyFlags {
+    let af_flags: AddressFamilyFlags = if cli.ip4 {
+        AddressFamilyFlags::IPV4
+    } else if cli.ip6 {
+        AddressFamilyFlags::IPV6
+    } else {
+        AddressFamilyFlags::all()
+    };
+    af_flags
 }
 
 fn show_udp(p : UdpSocketInfo) {
